@@ -5,12 +5,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { sampleProducts } from '@/db/seed'
+import { getAllProducts } from '@/data/products'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 import { createMiddleware, createServerFn } from '@tanstack/react-start'
 
 const fetchProducts = createServerFn({ method: 'GET' }).handler(async () => {
-  return { products: sampleProducts }
+  return await getAllProducts()
 })
 
 const loggerMiddleware = createMiddleware().server(
@@ -27,6 +28,7 @@ const loggerMiddleware = createMiddleware().server(
 
 export const Route = createFileRoute('/products/')({
   component: RouteComponent,
+  ssr: 'data-only',
   loader: async () => {
     return fetchProducts()
   },
@@ -36,7 +38,14 @@ export const Route = createFileRoute('/products/')({
 })
 
 function RouteComponent() {
-  const { products } = Route.useLoaderData()
+  const products = Route.useLoaderData()
+
+  const { data: productsData = [] } = useQuery({
+    queryKey: ['products'],
+    queryFn: () => fetchProducts(),
+    initialData: products,
+  })
+
   return (
     <div className="space-y-6">
       <section className="space-y-4 max-w-6xl mx-auto">
@@ -61,7 +70,7 @@ function RouteComponent() {
       </section>
       <section>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {products?.map((product, index) => (
+          {productsData?.map((product, index) => (
             <ProductCard key={`product-${index}`} product={product} />
           ))}
         </div>
