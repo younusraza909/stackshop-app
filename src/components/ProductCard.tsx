@@ -10,6 +10,8 @@ import {
   CardHeader,
   CardTitle,
 } from './ui/card'
+import { mutateCartFn } from '@/routes/cart'
+import { useQueryClient } from '@tanstack/react-query'
 
 const inventoryTone = {
   'in-stock': 'bg-emerald-50 text-emerald-600 border-emerald-100',
@@ -19,6 +21,7 @@ const inventoryTone = {
 
 export function ProductCard({ product }: { product: any }) {
   const router = useRouter()
+  const queryClient = useQueryClient()
   return (
     <Link
       to="/products/$id"
@@ -69,17 +72,17 @@ export function ProductCard({ product }: { product: any }) {
               console.log('add to cart')
               e.preventDefault()
               e.stopPropagation()
-              //   await mutateCartFn({
-              //     data: {
-              //       action: 'add',
-              //       productId: product.id,
-              //       quantity: 1,
-              //     },
-              //   })
+              await mutateCartFn({
+                data: {
+                  action: 'add',
+                  productId: product.id,
+                  quantity: 1,
+                },
+              })
               await router.invalidate({ sync: true })
-              //   await queryClient.invalidateQueries({
-              //     queryKey: ['cart-items-data'],
-              //   })
+              await queryClient.invalidateQueries({
+                queryKey: ['cart-items-data'],
+              })
             }}
           >
             <ShoppingBagIcon size={16} /> Add to Cart

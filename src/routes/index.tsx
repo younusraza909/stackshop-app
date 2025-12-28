@@ -6,13 +6,20 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { createServerFn } from '@tanstack/react-start'
 import { ArrowRightIcon } from 'lucide-react'
+
+const fetchRecommendedProducts = createServerFn({ method: 'GET' }).handler(
+  async () => {
+    const { getRecommendedProducts } = await import('@/data/products')
+    return getRecommendedProducts()
+  },
+)
 
 export const Route = createFileRoute('/')({
   component: App,
   loader: async () => {
-    const { getRecommendedProducts } = await import('@/data/products')
-    const products = await getRecommendedProducts()
+    const products = await fetchRecommendedProducts()
     return { products }
   },
 })
