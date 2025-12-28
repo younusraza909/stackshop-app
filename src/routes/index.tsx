@@ -5,13 +5,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { getRecommendedProducts } from '@/data/products'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { ArrowRightIcon } from 'lucide-react'
 
 export const Route = createFileRoute('/')({
   component: App,
   loader: async () => {
+    const { getRecommendedProducts } = await import('@/data/products')
     const products = await getRecommendedProducts()
     return { products }
   },
